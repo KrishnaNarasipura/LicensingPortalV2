@@ -1,0 +1,480 @@
+@page
+@model Licensing.Portal.Pages.Dealers.GenerateLicenseModel
+@{
+    ViewData["Title"] = "Generate License";
+}
+
+<style> 
+    .page-header {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h1 {
+        color: #333;
+        font-size: 28px;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-logout {
+        padding: 10px 20px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .btn-logout:hover {
+        transform: translateY(-2px);
+        background: #c82333;
+    }
+
+    .form-container {
+        background: white;
+        padding: 40px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .form-title {
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        color: #667eea;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: inherit;
+        transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 5px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group input:disabled {
+        background-color: #f5f5f5;
+        color: #999;
+        cursor: not-allowed;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-row .form-group {
+        margin-bottom: 0;
+    }
+
+    .required {
+        color: #dc3545;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 40px;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 12px 20px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+    }
+
+    .error-message {
+        background-color: #fee;
+        color: #c33;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 4px solid #c33;
+    }
+
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 4px solid #28a745;
+    }
+
+    .info-text {
+        color: #666;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .dealer-info-box {
+        background: #f0f7ff;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 4px solid #667eea;
+        margin-bottom: 20px;
+    }
+
+    .dealer-info-item {
+        margin: 8px 0;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .dealer-info-label {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    .license-result-box {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        padding: 25px;
+        border-radius: 5px;
+        border-left: 4px solid #28a745;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+    .license-result-box.show {
+        display: block;
+    }
+
+    .license-result-title {
+        color: #155724;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .license-result-item {
+        background: white;
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .license-result-label {
+        color: #155724;
+        font-weight: 600;
+        min-width: 150px;
+    }
+
+    .license-result-value {
+        color: #333;
+        font-family: 'Courier New', monospace;
+        font-weight: 500;
+        word-break: break-all;
+        flex: 1;
+        text-align: right;
+    }
+
+    .copy-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 10px;
+        transition: background-color 0.2s;
+    }
+
+    .copy-btn:hover {
+        background: #218838;
+    }
+
+    .copy-btn.copied {
+        background: #20c997;
+    }
+
+    .form-hidden {
+        display: none;
+    }
+
+    .form-visible {
+        display: block;
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <h1>Generate License</h1>
+    </div>
+    <div class="header-actions">
+        <form method="post" asp-page-handler="Logout" style="display: inline;">
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+
+<div class="form-container">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="error-message">@Model.ErrorMessage</div>
+    }
+
+    @if (Model.GeneratedLicense != null)
+    {
+        <div class="success-message">&#10004; License generated successfully!</div>
+        
+        <div class="license-result-box show">
+            <div class="license-result-title">Generated License Details</div>
+            
+            <div class="license-result-item">
+                <span class="license-result-label">License Key:</span>
+                <span class="license-result-value" id="licenseKeyValue">@Model.GeneratedLicense.LicenseKey</span>
+                <button type="button" class="copy-btn" onclick="copyLicenseKey()">Copy</button>
+            </div>
+
+            <div class="license-result-item">
+                <span class="license-result-label">Serial Number:</span>
+                <span class="license-result-value">@Model.GeneratedLicense.SerialNumber</span>
+            </div>
+
+            <div class="license-result-item">
+                <span class="license-result-label">License Type:</span>
+                <span class="license-result-value">@Model.GeneratedLicense.LicenseType</span>
+            </div>
+
+            <div class="license-result-item">
+                <span class="license-result-label">Issued At:</span>
+                <span class="license-result-value">@Model.GeneratedLicense.IssuedAt.ToString("yyyy-MM-dd")</span>
+            </div>
+
+            @if (Model.GeneratedLicense.ExpiresAt.HasValue)
+            {
+                <div class="license-result-item">
+                    <span class="license-result-label">Expires At:</span>
+                    <span class="license-result-value">@Model.GeneratedLicense.ExpiresAt.Value.ToString("yyyy-MM-dd")</span>
+                </div>
+            }
+        </div>
+
+        <div class="button-group">
+            <button type="button" class="btn-submit" onclick="window.print()">Print</button>
+            <button type="button" class="btn-cancel" onclick="resetForm()">Generate Another</button>
+        </div>
+    }
+    else
+    {
+        <div class="dealer-info-box">
+            <div class="dealer-info-item">
+                <span class="dealer-info-label">Dealer Name:</span> @Model.DealerName
+            </div>
+            <div class="dealer-info-item">
+                <span class="dealer-info-label">Dealer Code:</span> @Model.License.DealerCode
+            </div>
+        </div>
+
+        <form method="post">
+            <h2 class="form-title">License Configuration</h2>
+
+            <!-- Hidden fields to preserve data for form submission -->
+            <input type="hidden" asp-for="License.DealerCode" />
+            <input type="hidden" asp-for="License.InternalDealerId" />
+
+            <!-- License Configuration Section -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="serialNumber">Serial Number <span class="required">*</span></label>
+                    <input type="text" id="serialNumber" asp-for="License.SerialNumber" required placeholder="Enter serial number (max 8 characters)" maxlength="8" />
+                    <p class="info-text">Maximum 8 characters</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="licenseType">Type of License <span class="required">*</span></label>
+                    <select id="licenseType" asp-for="License.LicenseType" onchange="toggleExpiryDays()" required>
+                        <option value="">-- Select License Type --</option>
+                        <option value="Metered">Metered</option>
+                        <option value="Permanent">Permanent</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="issueDate">Issue Date <span class="required">*</span></label>
+                        <input type="text" id="issueDate" asp-for="License.IssueDate" disabled placeholder="Auto-populated" />
+                    </div>
+
+                    <div class="form-group" id="expiryDaysGroup" style="display: none;">
+                        <label for="expiryDays">Expiry Days <span class="required">*</span></label>
+                        <input type="number" id="expiryDays" asp-for="License.ExpiryDays" placeholder="Enter number of days" min="1" />
+                        <p class="info-text">Only for Metered licenses</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">Generate License</button>
+                <button type="submit" asp-page-handler="Cancel" class="btn-cancel">Cancel</button>
+            </div>
+        </form>
+    }
+</div>
+
+<script>
+    function toggleExpiryDays() {
+        const licenseType = document.getElementById('licenseType').value;
+        const expiryDaysGroup = document.getElementById('expiryDaysGroup');
+        const expiryDaysInput = document.getElementById('expiryDays');
+
+        if (licenseType === 'Metered') {
+            expiryDaysGroup.style.display = 'block';
+            expiryDaysInput.required = true;
+        } else {
+            expiryDaysGroup.style.display = 'none';
+            expiryDaysInput.required = false;
+            expiryDaysInput.value = '';
+        }
+    }
+
+    // Format and display issue date
+    document.addEventListener('DOMContentLoaded', function () {
+        const issueDateInput = document.getElementById('issueDate');
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+        issueDateInput.value = formattedDate;
+
+        // Initialize expiry days visibility based on current license type selection
+        toggleExpiryDays();
+    });
+
+    function resetForm() {
+        // Navigate back to the same page to clear the generated license
+        window.location.href = window.location.pathname;
+    }
+
+    function copyLicenseKey() {
+        const licenseKeyElement = document.getElementById('licenseKeyValue');
+        const textToCopy = licenseKeyElement.textContent.trim();
+        const button = event.currentTarget; // Use currentTarget to get the button that triggered the event
+        
+        // Use the Clipboard API
+        navigator.clipboard.writeText(textToCopy)
+            .then(function () {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(function () {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            })
+            .catch(function (err) {
+                // Fallback for older browsers
+                try {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = textToCopy;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    const originalText = button.textContent;
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    
+                    setTimeout(function () {
+                        button.textContent = originalText;
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (error) {
+                    alert('Failed to copy to clipboard. Please copy manually:\n\n' + textToCopy);
+                    console.error('Copy error:', error);
+                }
+            });
+    }
+</script>

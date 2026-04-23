@@ -1,0 +1,432 @@
+﻿@page
+@model Licensing.Portal.Pages.Admin.ValidateLicenseModel
+@using Licensing.Portal.Models
+@{
+    ViewData["Title"] = "Validate License";
+}
+
+<style>
+    .page-header {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h1 {
+        color: #333;
+        font-size: 28px;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-logout {
+        padding: 10px 20px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .btn-logout:hover {
+        transform: translateY(-2px);
+        background: #c82333;
+    }
+
+    .form-container {
+        background: white;
+        padding: 40px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .form-title {
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: inherit;
+        transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 5px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group input:disabled {
+        background-color: #f5f5f5;
+        color: #999;
+        cursor: not-allowed;
+    }
+
+    .required {
+        color: #dc3545;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 40px;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 12px 20px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+    }
+
+    .error-message {
+        background-color: #fee;
+        color: #c33;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 4px solid #c33;
+    }
+
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 4px solid #28a745;
+    }
+
+    .info-text {
+        color: #666;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .validation-result-box {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        padding: 25px;
+        border-radius: 5px;
+        border-left: 4px solid #28a745;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+    .validation-result-box.show {
+        display: block;
+    }
+
+    .validation-result-box.error {
+        background: linear-gradient(135deg, #fee 0%, #fdd 100%);
+        border-left-color: #c33;
+    }
+
+    .validation-result-title {
+        color: #155724;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .validation-result-box.error .validation-result-title {
+        color: #c33;
+    }
+
+    .validation-result-item {
+        background: white;
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .validation-result-label {
+        color: #155724;
+        font-weight: 600;
+        min-width: 150px;
+    }
+
+    .validation-result-box.error .validation-result-label {
+        color: #c33;
+    }
+
+    .validation-result-value {
+        color: #333;
+        font-family: 'Courier New', monospace;
+        font-weight: 500;
+        word-break: break-all;
+        flex: 1;
+        text-align: right;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    .status-badge.valid {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .status-badge.expired {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .status-badge.permanent {
+        background-color: #667eea;
+        color: white;
+    }
+
+    .copy-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 10px;
+        transition: background-color 0.2s;
+    }
+
+    .copy-btn:hover {
+        background: #218838;
+    }
+
+    .copy-btn.copied {
+        background: #20c997;
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <h1>Validate License</h1>
+    </div>
+    <div class="header-actions">
+        <a href="/Dealers/Index" class="btn-logout" style="background: #667eea; text-decoration: none; display: inline-flex; align-items: center;">
+            ← Back to Dealers
+        </a>
+        <form method="post" asp-page-handler="Logout" style="display: inline;">
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+
+<div class="form-container">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage) && !Model.IsValidated)
+    {
+        <div class="error-message">@Model.ErrorMessage</div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage) && Model.IsValidated)
+    {
+        <div class="success-message">@Model.SuccessMessage</div>
+    }
+
+    @if (Model.IsValidated && Model.ValidatedLicense != null)
+    {
+        bool isExpired = Model.ValidatedLicense.LicenseType == LicenseType.METERED
+            && Model.ValidatedLicense.ExpiresAt.HasValue
+            && DateTime.UtcNow > Model.ValidatedLicense.ExpiresAt.Value;
+
+        <div class="validation-result-box show @(isExpired && Model.ValidatedLicense.LicenseType == LicenseType.METERED ? "error" : "")">
+            <div class="validation-result-title">
+                License Details
+                @if (isExpired && Model.ValidatedLicense.LicenseType == LicenseType.METERED)
+                {
+                    <span class="status-badge expired">❌ EXPIRED</span>
+                }
+                else if (Model.ValidatedLicense.LicenseType == LicenseType.PERMANENT)
+                {
+                    <span class="status-badge permanent">✓ PERMANENT</span>
+                }
+                else
+                {
+                    <span class="status-badge valid">✓ ACTIVE</span>
+                }
+            </div>
+
+            <div class="validation-result-item">
+                <span class="validation-result-label">License Key:</span>
+                <span class="validation-result-value" id="licenseKeyValue">@Model.LicenseKey</span>
+                <button type="button" class="copy-btn" onclick="copyToClipboard('licenseKeyValue')">Copy</button>
+            </div>
+
+            <div class="validation-result-item">
+                <span class="validation-result-label">Serial Number:</span>
+                <span class="validation-result-value">@Model.ValidatedLicense.SerialNumber</span>
+            </div>
+
+            <div class="validation-result-item">
+                <span class="validation-result-label">Sequence Number:</span>
+                <span class="validation-result-value">@Model.ValidatedLicense.Sequence</span>
+            </div>
+
+            <div class="validation-result-item">
+                <span class="validation-result-label">License Type:</span>
+                <span class="validation-result-value">
+                    @if (Model.ValidatedLicense.LicenseType == LicenseType.PERMANENT)
+                    {
+                        <text>Permanent (Never Expires)</text>
+                    }
+                    else
+                    {
+                        <text>Metered (Time-Limited)</text>
+                    }
+                </span>
+            </div>
+
+            <div class="validation-result-item">
+                <span class="validation-result-label">Issued At:</span>
+                <span class="validation-result-value">@TimeZoneInfo.ConvertTime(Model.ValidatedLicense.IssuedAt, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")).ToString("yyyy-MM-dd")</span>
+            </div>
+
+            @if (Model.ValidatedLicense.ExpiresAt.HasValue)
+            {
+                <div class="validation-result-item">
+                    <span class="validation-result-label">Expires At:</span>
+                    <span class="validation-result-value">@TimeZoneInfo.ConvertTime(Model.ValidatedLicense.ExpiresAt.Value, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")).ToString("yyyy-MM-dd")</span>
+                </div>
+
+                @if (Model.ValidatedLicense.LicenseType == LicenseType.METERED && !isExpired)
+                {
+                    TimeSpan timeRemaining = Model.ValidatedLicense.ExpiresAt.Value - DateTime.UtcNow;
+                    <div class="validation-result-item">
+                        <span class="validation-result-label">Time Remaining:</span>
+                        <span class="validation-result-value">
+                            @((int)timeRemaining.TotalDays) days
+                        </span>
+                    </div>
+                }
+                else if (isExpired)
+                {
+                    TimeSpan timeSinceExpiry = DateTime.UtcNow - Model.ValidatedLicense.ExpiresAt.Value;
+                    <div class="validation-result-item">
+                        <span class="validation-result-label">Expired Since:</span>
+                        <span class="validation-result-value" style="color: #c33;">
+                            @((int)timeSinceExpiry.TotalDays) days ago
+                        </span>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="button-group">
+            <button type="button" class="btn-submit" onclick="resetForm()">Validate Another</button>
+            <button type="button" class="btn-cancel" onclick="window.print()">Print</button>
+        </div>
+    }
+    else
+    {
+        <form method="post">
+            <h2 class="form-title">Enter License Key</h2>
+
+            <div class="form-group">
+                <label for="licenseKey">License Key <span class="required">*</span></label>
+                <input type="text" id="licenseKey" name="licenseKey" asp-for="LicenseKey" required placeholder="Enter license key (Format: XXXX-XXXX-XXXX-XXXX-XXXX-XXXX)" />
+                <p class="info-text">Enter the license key in the format: XXXX-XXXX-XXXX-XXXX-XXXX-XXXX (24 characters)</p>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">Validate License</button>
+            </div>
+        </form>
+    }
+</div>
+
+<script>
+    function resetForm() {
+        window.location.href = window.location.pathname;
+    }
+
+    function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        const textToCopy = element.textContent.trim();
+        const button = event.currentTarget;
+
+        navigator.clipboard.writeText(textToCopy)
+            .then(function () {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                button.classList.add('copied');
+
+                setTimeout(function () {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            })
+            .catch(function (err) {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard. Please try again.');
+            });
+    }
+</script>

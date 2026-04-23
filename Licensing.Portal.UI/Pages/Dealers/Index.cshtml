@@ -1,0 +1,539 @@
+﻿@page
+@model Licensing.Portal.Pages.Dealers.IndexModel
+@{
+    ViewData["Title"] = "Dealers List";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .user-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f9f9f9;
+            border-bottom: 2px solid #ddd;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #333;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .no-dealers {
+            padding: 40px;
+            text-align: center;
+            color: #999;
+        }
+
+        .dealer-code {
+            background: #e8f5e9;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: #2e7d32;
+            font-size: 13px;
+        }
+
+        .created-date {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-reset {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #e68900;
+            transform: translateY(-1px);
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        .error-message {
+            background-color: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-header {
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .modal-body {
+            margin: 25px 0;
+        }
+
+        .password-display-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .password-label {
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .password-value {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            padding-right: 40px;
+        }
+
+        .copy-button-wrapper {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+            border-color: white;
+        }
+
+        .copy-btn.copied {
+            background: #4caf50;
+            border-color: #4caf50;
+        }
+
+        .dealer-info {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .dealer-info-item {
+            margin: 8px 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .dealer-info-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .warning-text {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .modal-footer {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        .modal-footer button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-footer button:hover {
+            transform: translateY(-2px);
+        }
+
+        .copy-feedback {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+            font-weight: 600;
+        }
+
+        .copy-feedback.show {
+            display: block;
+        }
+
+        @@keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .btn-validate {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .btn-validate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Dealer Registration</h1>
+        </div>
+        <div class="header-actions">
+            <div class="user-info">
+                Welcome, <strong>Admin</strong>
+            </div>
+            <a href="/Dealers/Create" class="btn btn-primary">+ Create Dealer</a>
+            <a href="/Admin/ValidateLicense" class="btn btn-validate">Validate License</a>
+            <form method="post" asp-page-handler="Logout" style="display: inline;">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="success-message">@Model.SuccessMessage</div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="error-message">@Model.ErrorMessage</div>
+    }
+
+    <div class="table-container">
+        @if (Model.Dealers.Count == 0)
+        {
+            <div class="no-dealers">
+                <p>No dealers registered yet. Click the "Create Dealer" button to add a new dealer.</p>
+            </div>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dealer Code</th>
+                        <th>Dealer Name</th>
+                        <th>Phone Number</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Pincode</th>
+                        <th>Internal ID</th>
+                        <th>Address</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var dealer in Model.Dealers)
+                    {
+                        <tr>
+                            <td>
+                                <span class="dealer-code">@dealer.DealerCode</span>
+                            </td>
+                            <td>@dealer.DealerName</td>
+                            <td>@dealer.PhoneNumber</td>
+                            <td>@dealer.City</td>
+                            <td>@dealer.State</td>
+                            <td>@dealer.Pincode</td>
+                            <td>@dealer.InternalDealerId</td>
+                            <td>@dealer.Address</td>
+                            <td>
+                                <span class="created-date">@dealer.CreatedDate.ToString("dd MMM yyyy HH:mm")</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <form method="post" asp-page-handler="ResetPassword" style="display: inline;">
+                                        <input type="hidden" name="dealerCode" value="@dealer.DealerCode" />
+                                        <button type="submit" class="btn-small btn-reset">Reset Password</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Password Reset Successful!</h2>
+            </div>
+            <div class="modal-body">
+                <div class="dealer-info">
+                    <div class="dealer-info-item">
+                        <span class="dealer-info-label">Dealer Code:</span> <span id="resetDealerCodeDisplay"></span>
+                    </div>
+                    <div class="dealer-info-item">
+                        <span class="dealer-info-label">Dealer Name:</span> <span id="resetDealerNameDisplay"></span>
+                    </div>
+                </div>
+                <p style="color: #666; font-size: 14px; margin: 15px 0;">New Temporary Password:</p>
+                <div class="password-display-box">
+                    <div class="password-label">Password</div>
+                    <div class="password-value" id="resetPasswordDisplay"></div>
+                    <div class="copy-button-wrapper">
+                        <button type="button" class="copy-btn" onclick="copyPasswordToClipboard()" title="Copy password to clipboard">
+                            📋 Copy
+                        </button>
+                    </div>
+                </div>
+                <p class="warning-text">Share this new password with the dealer. They must change it on next login.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeResetModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Feedback Toast -->
+    <div id="copyFeedback" class="copy-feedback">
+         DealerCode/Password copied to clipboard!
+    </div>
+
+    <script>
+        function closeResetModal() {
+            document.getElementById('resetPasswordModal').classList.remove('show');
+        }
+
+        function copyPasswordToClipboard() {
+            const DealerCode = document.getElementById('resetDealerCodeDisplay').textContent;
+            const passwordText = document.getElementById('resetPasswordDisplay').textContent;
+            const textToCopy = DealerCode + '/' + passwordText;
+            const copyButton = document.querySelector('.copy-btn');
+
+            // Copy to clipboard using modern API
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Show success feedback
+                copyButton.classList.add('copied');
+                copyButton.textContent = '✓ Copied!';
+
+                // Show toast notification
+                const toast = document.getElementById('copyFeedback');
+                toast.classList.add('show');
+
+                // Reset button and hide toast after 2 seconds
+                setTimeout(() => {
+                    copyButton.classList.remove('copied');
+                    copyButton.textContent = '📋 Copy';
+                    toast.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard. Please try again.');
+            });
+        }
+
+        // Show reset modal if password was reset
+        document.addEventListener('DOMContentLoaded', function() {
+            const showModal = '@TempData["ShowResetModal"]';
+            const newPassword = '@Html.Raw(TempData["NewPassword"]?.ToString() ?? "")';
+            const dealerCode = '@TempData["DealerCode"]';
+            const dealerName = '@TempData["DealerName"]';
+
+            if (showModal && newPassword && dealerCode && dealerName) {
+                document.getElementById('resetDealerCodeDisplay').textContent = dealerCode;
+                document.getElementById('resetDealerNameDisplay').textContent = dealerName;
+                document.getElementById('resetPasswordDisplay').textContent = newPassword;
+                document.getElementById('resetPasswordModal').classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
