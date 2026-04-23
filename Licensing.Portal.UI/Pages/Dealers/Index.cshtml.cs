@@ -75,5 +75,41 @@ namespace Licensing.Portal.Pages.Dealers
             Dealers = await _dealerService.GetAllDealersAsync();
             return Page();
         }
+
+        public async Task<IActionResult> OnPostDeleteAsync(string dealerCode)
+        {
+            // Check if admin is logged in
+            var adminUser = HttpContext.Session.GetString("AdminUser");
+            if (string.IsNullOrEmpty(adminUser))
+            {
+                return RedirectToPage("/Login");
+            }
+
+            try
+            {
+                var dealer = await _dealerService.GetDealerAsync(dealerCode);
+                if (dealer == null)
+                {
+                    TempData["ErrorMessage"] = "Dealer not found.";
+                    return RedirectToPage();
+                }
+
+                var success = await _dealerService.DeleteDealerAsync(dealerCode);
+                
+                if (!success)
+                {
+                    TempData["ErrorMessage"] = "Failed to delete dealer.";
+                    return RedirectToPage();
+                }
+
+                TempData["SuccessMessage"] = $"Dealer '{dealer.DealerName}' ({dealer.DealerCode}) deleted successfully!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error deleting dealer: {ex.Message}";
+            }
+
+            return RedirectToPage();
+        }
     }
 }

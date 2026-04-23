@@ -39,10 +39,17 @@ namespace Licensing.Portal.Services
                 dealer.CreatedDate = DateTime.UtcNow;
                 dealer.LicenseSequence = 0;
 
-                // Add to Azure Table Storage
-                await _azureTableStorageService.AddDealerAsync(dealer);
+                if (await _azureTableStorageService.GetDealerByInternalDealerIdAsync(dealer.InternalDealerId) == null)
+                {
+                    // Add to Azure Table Storage
+                    await _azureTableStorageService.AddDealerAsync(dealer);
 
-                return (true, "Dealer created successfully", dealer, tempPassword);
+                    return (true, "Dealer created successfully", dealer, tempPassword);
+                }
+               else
+                {
+                    return (false, $"Error creating dealer:Internal Dealer Id {dealer.InternalDealerId} already used ", null, null);
+                }
             }
             catch (Exception ex)
             {
@@ -183,6 +190,68 @@ namespace Licensing.Portal.Services
         public int IncrementLicenseSequence(string dealerCode)
         {
             return IncrementLicenseSequenceAsync(dealerCode).Result;
+        }
+
+        /// <summary>
+        /// Updates an existing dealer without fetching current data
+        /// Assumes system-managed fields are already populated in the dealer object
+        /// </summary>
+        public async Task<bool> UpdateDealerAsync(Dealer dealer)
+        {
+            try
+            {
+                await _azureTableStorageService.UpsertDealerAsync(dealer);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing dealer with validation
+        /// Fetches current dealer to preserve system-managed fields
+        /// </summary>
+        public async Task<bool> UpdateDealerWithValidationAsync(Dealer dealer)
+        {
+            try
+            {
+                // Verify dealer exists before updating
+                var existingDealer = await GetDealerAsync(dealer.DealerCode);
+                if (existingDealer == null) return false;
+
+                // Preserve system-managed fields from existing dealer
+                dealer.CreatedDate = existingDealer.CreatedDate;
+                dealer.TemporaryPassword = existingDealer.TemporaryPassword;
+                dealer.Password = existingDealer.Password;
+                dealer.PasswordChangeRequired = existingDealer.PasswordChangeRequired;
+                dealer.LicenseSequence = existingDealer.LicenseSequence;
+
+                await _azureTableStorageService.UpsertDealerAsync(dealer);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Deletes a dealer by dealer code
+        /// </summary>
+        public async Task<bool> DeleteDealerAsync(string dealerCode)
+        {
+            try
+            {
+                // Just delete without fetching - the dealer code is the only identifier needed
+                await _azureTableStorageService.DeleteDealerAsync(dealerCode);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>

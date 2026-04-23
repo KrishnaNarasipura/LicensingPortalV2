@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Licensing.Portal.Data\Licensing.Portal.Data.csproj" />
     <ProjectReference Include="..\Licensing.Portal.Models\Licensing.Portal.Models.csproj" />
     <ProjectReference Include="..\Licensing.Portal.Services\Licensing.Portal.Services.csproj" />
   </ItemGroup>

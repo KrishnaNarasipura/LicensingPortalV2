@@ -54,6 +54,7 @@ namespace Licensing.Portal.Services
         public async Task<DealerTableEntity> AddDealerAsync(Dealer dealer)
         {
             var entity = new DealerTableEntity(dealer);
+            
             await _tableClient.AddEntityAsync(entity);
             return entity;
         }
@@ -90,35 +91,10 @@ namespace Licensing.Portal.Services
             }
         }
 
-        public async Task<List<DealerTableEntity>> GetDealersByCityAsync(string city)
+        
+        public async Task<DealerTableEntity?> GetDealerByInternalDealerIdAsync(string internalDealerId)
         {
-            var dealers = new List<DealerTableEntity>();
-            var filter = $"PartitionKey eq 'Dealers' and City eq '{city}'";
-            
-            await foreach (var dealer in _tableClient.QueryAsync<DealerTableEntity>(filter: filter))
-            {
-                dealers.Add(dealer);
-            }
-            
-            return dealers;
-        }
-
-        public async Task<List<DealerTableEntity>> GetDealersByStateAsync(string state)
-        {
-            var dealers = new List<DealerTableEntity>();
-            var filter = $"PartitionKey eq 'Dealers' and State eq '{state}'";
-            
-            await foreach (var dealer in _tableClient.QueryAsync<DealerTableEntity>(filter: filter))
-            {
-                dealers.Add(dealer);
-            }
-            
-            return dealers;
-        }
-
-        public async Task<DealerTableEntity?> GetDealerByPhoneNumberAsync(string phoneNumber)
-        {
-            var filter = $"PartitionKey eq 'Dealers' and PhoneNumber eq '{phoneNumber}'";
+            var filter = $"PartitionKey eq 'Dealers' and InternalDealerId eq '{internalDealerId}'";
             
             await foreach (var dealer in _tableClient.QueryAsync<DealerTableEntity>(filter: filter))
             {
@@ -128,19 +104,5 @@ namespace Licensing.Portal.Services
             return null;
         }
 
-        public async Task<int> GetNextLicenseSequenceAsync(string dealerCode)
-        {
-            var dealer = await GetDealerAsync(dealerCode);
-            
-            if (dealer == null)
-            {
-                throw new InvalidOperationException($"Dealer with code {dealerCode} not found.");
-            }
-
-            dealer.LicenseSequence++;
-            await UpdateDealerAsync(dealer.ToDealer());
-            
-            return dealer.LicenseSequence;
-        }
     }
 }

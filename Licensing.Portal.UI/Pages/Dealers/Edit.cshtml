@@ -1,0 +1,271 @@
+@page
+@model Licensing.Portal.Pages.Dealers.EditModel
+@{
+    ViewData["Title"] = "Edit Dealer";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input[readonly],
+        .form-group textarea[readonly] {
+            background-color: #f9f9f9;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        .info-text {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        .error-message {
+            background-color: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        .form-title {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .dealer-code-display {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .dealer-code-display p {
+            color: #2e7d32;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+
+        .dealer-code-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .dealer-code-value {
+            font-size: 20px;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Edit Dealer</h1>
+    </div>
+
+    <div class="form-container">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="error-message">
+                <p>@Model.ErrorMessage</p>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="success-message">
+                <p>@Model.SuccessMessage</p>
+            </div>
+        }
+
+        <div class="dealer-code-display">
+            <p class="dealer-code-label">Dealer Code</p>
+            <p class="dealer-code-value">@Model.Dealer.DealerCode</p>
+        </div>
+
+        <form method="post">
+            <h2 class="form-title">Dealer Information</h2>
+
+            <input type="hidden" asp-for="Dealer.DealerCode" />
+
+            <div class="form-group">
+                <label for="dealerName">Dealer Name <span class="required">*</span></label>
+                <input type="text" id="dealerName" asp-for="Dealer.DealerName" required placeholder="Enter dealer name" />
+            </div>
+
+            <div class="form-group">
+                <label for="address">Address <span class="required">*</span></label>
+                <textarea id="address" asp-for="Dealer.Address" required placeholder="Enter full address" rows="3"></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city">City <span class="required">*</span></label>
+                    <input type="text" id="city" asp-for="Dealer.City" required placeholder="Enter city" />
+                </div>
+
+                <div class="form-group">
+                    <label for="state">State <span class="required">*</span></label>
+                    <input type="text" id="state" asp-for="Dealer.State" required placeholder="Enter state" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pincode">Pincode <span class="required">*</span></label>
+                    <input type="text" id="pincode" asp-for="Dealer.Pincode" required placeholder="Enter pincode" pattern="[0-9]{5,10}" />
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="phoneNumber" asp-for="Dealer.PhoneNumber" required placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}" inputmode="numeric" />
+                    <p class="info-text">10-digit mobile number</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="internalDealerId">Internal Dealer ID <span class="required">*</span></label>
+                    <input type="text" id="internalDealerId" asp-for="Dealer.InternalDealerId" required placeholder="Enter 2-digit internal ID" pattern="[0-9]{2}" maxlength="2" inputmode="numeric" />
+                    <p class="info-text">Exactly 2 digits (e.g., 01, 12, 99)</p>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="submit" asp-page-handler="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
