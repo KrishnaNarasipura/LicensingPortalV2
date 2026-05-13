@@ -70,11 +70,11 @@ namespace Licensing.Portal.Pages.Dealers
             try
             {
                 // Update the dealer using the data already loaded (system-managed fields preserved from OnGetAsync)
-                var success = await _dealerService.UpdateDealerAsync(Dealer);
+                var (success, message) = await _dealerService.UpdateDealerAsync(Dealer);
                 
                 if (!success)
                 {
-                    ErrorMessage = "Failed to update dealer.";
+                    ErrorMessage = message;
                     return Page();
                 }
 

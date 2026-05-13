@@ -196,16 +196,22 @@ namespace Licensing.Portal.Services
         /// Updates an existing dealer without fetching current data
         /// Assumes system-managed fields are already populated in the dealer object
         /// </summary>
-        public async Task<bool> UpdateDealerAsync(Dealer dealer)
+        public async Task<(bool Success, string Message)> UpdateDealerAsync(Dealer dealer)
         {
             try
             {
+                var existingDealer = await _azureTableStorageService.GetDealerByInternalDealerIdAsync(dealer.InternalDealerId);
+                if (existingDealer != null)
+                {
+                    return (false, $"Error creating dealer:Internal Dealer Id {dealer.InternalDealerId} already used");
+                }
+
                 await _azureTableStorageService.UpsertDealerAsync(dealer);
-                return true;
+                return (true, "Dealer updated successfully");
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                return (false, $"Error updating dealer: {ex.Message}");
             }
         }
 
@@ -213,13 +219,13 @@ namespace Licensing.Portal.Services
         /// Updates an existing dealer with validation
         /// Fetches current dealer to preserve system-managed fields
         /// </summary>
-        public async Task<bool> UpdateDealerWithValidationAsync(Dealer dealer)
+        public async Task<(bool Success, string Message)> UpdateDealerWithValidationAsync(Dealer dealer)
         {
             try
             {
                 // Verify dealer exists before updating
                 var existingDealer = await GetDealerAsync(dealer.DealerCode);
-                if (existingDealer == null) return false;
+                if (existingDealer == null) return (false, $"Dealer with code {dealer.DealerCode} not found");
 
                 // Preserve system-managed fields from existing dealer
                 dealer.CreatedDate = existingDealer.CreatedDate;
@@ -229,11 +235,11 @@ namespace Licensing.Portal.Services
                 dealer.LicenseSequence = existingDealer.LicenseSequence;
 
                 await _azureTableStorageService.UpsertDealerAsync(dealer);
-                return true;
+                return (true, "Dealer updated successfully");
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                return (false, $"Error updating dealer: {ex.Message}");
             }
         }
 
