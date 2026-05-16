@@ -119,6 +119,14 @@ namespace Licensing.Portal.Pages.Dealers
                     License.IssueDate = DateTime.Now;
                     return Page();
                 }
+                if (License.ExpiryDays > 365)
+                {
+                    ErrorMessage = "Metered license cannot accept more than 365 days.";
+                    License.DealerCode = dealer.DealerCode;
+                    License.InternalDealerId = dealer.InternalDealerId;
+                    License.IssueDate = DateTime.Now;
+                    return Page();
+                }
 
                 // Calculate expiry date for Metered license
                 expiryDate = License.IssueDate.AddDays(License.ExpiryDays.Value);

@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model Licensing.Portal.Pages.Dealers.CreateModel
 @{
     ViewData["Title"] = "Register Dealer";
@@ -430,7 +430,7 @@
 
             <div class="button-group">
                 <button type="submit" class="btn btn-primary">Submit & Generate Code</button>
-                <button type="submit" asp-page-handler="Cancel" class="btn btn-secondary">Cancel</button>
+                <button type="button" onclick="window.location.href='/Dealers/Index'" class="btn btn-secondary">Cancel</button>
             </div>
         </form>
     </div>
@@ -456,7 +456,7 @@
                     <div class="password-value" id="passwordDisplay"></div>
                     <div class="copy-button-wrapper">
                         <button type="button" class="copy-btn" onclick="copyPasswordToClipboard()" title="Copy password to clipboard">
-                            📋 Copy
+                            ðŸ“‹ Copy
                         </button>
                     </div>
                 </div>
@@ -488,7 +488,7 @@
             navigator.clipboard.writeText(textToCopy).then(() => {
                 // Show success feedback
                 copyButton.classList.add('copied');
-                copyButton.textContent = '✓ Copied!';
+                copyButton.textContent = 'âœ“ Copied!';
 
                 // Show toast notification
                 const toast = document.getElementById('toastNotification');
@@ -497,7 +497,7 @@
                 // Reset button and hide toast after 2 seconds
                 setTimeout(() => {
                     copyButton.classList.remove('copied');
-                    copyButton.textContent = '📋 Copy';
+                    copyButton.textContent = 'ðŸ“‹ Copy';
                     toast.classList.remove('show');
                 }, 2000);
             }).catch(err => {
