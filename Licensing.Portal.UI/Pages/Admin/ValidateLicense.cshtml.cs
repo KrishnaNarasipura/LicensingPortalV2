@@ -34,7 +34,7 @@ namespace Licensing.Portal.Pages.Admin
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
             // Check if admin is logged in
             var adminUser = HttpContext.Session.GetString("AdminUser");
@@ -52,13 +52,15 @@ namespace Licensing.Portal.Pages.Admin
             try
             {
                 // Validate the license key
-                if (_licenseService.TryValidateLicense(LicenseKey, out var licenseKeyData))
+                var licenseKeyData = await _licenseService.TryValidateLicenseAsync(LicenseKey);
+                
+                if (licenseKeyData != null)
                 {
                     ValidatedLicense = licenseKeyData;
                     IsValidated = true;
 
                     // Check if license is expired
-                    bool isExpired = licenseKeyData!.LicenseType == LicenseType.METERED
+                    bool isExpired = licenseKeyData.LicenseType == LicenseType.METERED
                         && licenseKeyData.ExpiresAt.HasValue
                         && DateTime.UtcNow > licenseKeyData.ExpiresAt.Value;
 

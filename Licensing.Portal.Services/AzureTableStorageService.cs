@@ -8,7 +8,9 @@ namespace Licensing.Portal.Services
     public class AzureTableStorageService
     {
         private readonly TableClient _tableClient;
+        private readonly TableClient _appSettingsTableClient;
         private const string TableName = "Dealers";
+        private const string AppSettingsTableName = "AppSettings";
 
         public AzureTableStorageService(IConfiguration configuration)
         {
@@ -21,9 +23,11 @@ namespace Licensing.Portal.Services
 
             var serviceClient = new TableServiceClient(connectionString);
             _tableClient = serviceClient.GetTableClient(TableName);
+            _appSettingsTableClient = serviceClient.GetTableClient(AppSettingsTableName);
             
-            // Create table if it doesn't exist
+            // Create tables if they don't exist
             _tableClient.CreateIfNotExists();
+            _appSettingsTableClient.CreateIfNotExists();
         }
 
         public async Task<DealerTableEntity?> GetDealerAsync(string dealerCode)
@@ -104,5 +108,29 @@ namespace Licensing.Portal.Services
             return null;
         }
 
+        /// <summary>
+        /// Gets a setting value from the AppSettings table
+        /// </summary>
+        public async Task<string?> GetAppSettingAsync(string settingName)
+        {
+            try
+            {
+                var response = await _appSettingsTableClient.GetEntityAsync<AppSettingEntity>("AppSettings", "Secrets");
+                
+                // Use reflection to get the property value dynamically
+                var property = typeof(AppSettingEntity).GetProperty(settingName);
+                if (property != null)
+                {
+                    return property.GetValue(response.Value)?.ToString();
+                }
+                
+                return null;
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                return null;
+            }
+        }
     }
+
 }

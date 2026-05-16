@@ -31,16 +31,29 @@ namespace Licensing.Portal.Services;
 /// </summary>
 public class LicenseService
 {
-    private readonly string _hmacSecretKey;
+    private readonly AzureTableStorageService _azureTableStorageService;
     private readonly DateTime _epoch = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    public LicenseService(IConfiguration configuration)
+    public LicenseService(AzureTableStorageService azureTableStorageService)
     {
-        _hmacSecretKey = configuration["Licensing:LicenseKeySecret"] 
-            ?? throw new InvalidOperationException("LicenseKeySecret not configured");
+        _azureTableStorageService = azureTableStorageService;
     }
 
-    public string GenerateLicense(string serialStr, DateTime issueDate, DateTime? expiryDate, LicenseType licenseType, int sequence)
+    /// <summary>
+    /// Gets the HMAC secret key from Azure Table Storage
+    /// </summary>
+    private async Task<string> GetHmacSecretKeyAsync()
+    {
+        var secretFromTable = await _azureTableStorageService.GetAppSettingAsync("LicenseKeySecret");
+        if (!string.IsNullOrEmpty(secretFromTable))
+        {
+            return secretFromTable;
+        }
+
+        throw new InvalidOperationException("LicenseKeySecret not found");
+    }
+
+    public async Task<string> GenerateLicenseAsync(string serialStr, DateTime issueDate, DateTime? expiryDate, LicenseType licenseType, int sequence)
     {
         if (string.IsNullOrEmpty(serialStr) || serialStr.Length > 7)
             throw new ArgumentException("Serial must be 1-7 characters");
@@ -93,7 +106,8 @@ public class LicenseService
         dataHeader[10] = 0; // Extra byte for alignment
 
         // 4. Compute HMAC-SHA256 signature and combine with data header
-        using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_hmacSecretKey)))
+        string hmacSecretKey = await GetHmacSecretKeyAsync();
+        using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(hmacSecretKey)))
         {
             byte[] fullHash = hmac.ComputeHash(dataHeader, 0, 10); // Hash only the first 10 bytes
 
@@ -105,19 +119,22 @@ public class LicenseService
         // 5. Encode as Base32 and return
         var rawLicenseKey = ToBase32(finalBytes);
         return FormatLicenseKey(rawLicenseKey);
-
     }
 
-    public bool TryValidateLicense(string licenseKey, out LicenseKeyData? licenseKeyData)
+    public string GenerateLicense(string serialStr, DateTime issueDate, DateTime? expiryDate, LicenseType licenseType, int sequence)
+    {
+        return GenerateLicenseAsync(serialStr, issueDate, expiryDate, licenseType, sequence).Result;
+    }
+
+    public async Task<LicenseKeyData?> TryValidateLicenseAsync(string licenseKey)
     {
         string serial = "0"; uint issueDays = 0; uint expiryDays = 0; bool isPermanant = false; uint sequence = 0;
-        licenseKeyData = new LicenseKeyData();
         try
         {
             string key = licenseKey.Replace("-", "").ToUpper();
 
             byte[] finalBytes = FromBase32(key);
-            if (finalBytes.Length != 15) return false;
+            if (finalBytes.Length != 15) return null;
 
             // 1. Separate Data (11 bytes) and HMAC (4 bytes)
             byte[] dataHeader = new byte[11];
@@ -126,12 +143,13 @@ public class LicenseService
             Buffer.BlockCopy(finalBytes, 11, providedHmac, 0, 4);
 
             // 2. Verify HMAC Signature
-            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_hmacSecretKey)))
+            string hmacSecretKey = await GetHmacSecretKeyAsync();
+            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(hmacSecretKey)))
             {
                 byte[] calculatedHash = hmac.ComputeHash(dataHeader, 0, 10);
                 for (int i = 0; i < 4; i++)
                 {
-                    if (providedHmac[i] != calculatedHash[i]) return false;
+                    if (providedHmac[i] != calculatedHash[i]) return null;
                 }
             }
 
@@ -168,18 +186,28 @@ public class LicenseService
             var issuedDate = _epoch.Date.AddDays(issueDays);
             var expiryDate = _epoch.Date.AddDays(expiryDays);
 
-            licenseKeyData.SerialNumber = serial;
-            licenseKeyData.IssuedAt = issuedDate;
-            licenseKeyData.ExpiresAt = expiryDate;
-            licenseKeyData.Sequence = Convert.ToInt32(sequence);
-            licenseKeyData.LicenseType = isPermanant ? LicenseType.PERMANENT : LicenseType.METERED;
+            var licenseKeyData = new LicenseKeyData
+            {
+                SerialNumber = serial,
+                IssuedAt = issuedDate,
+                ExpiresAt = expiryDate,
+                Sequence = Convert.ToInt32(sequence),
+                LicenseType = isPermanant ? LicenseType.PERMANENT : LicenseType.METERED
+            };
 
-            return true;
+            return licenseKeyData;
         }
         catch
         {
-            return false;
+            return null;
         }
+    }
+
+    public bool TryValidateLicense(string licenseKey, out LicenseKeyData? licenseKeyData)
+    {
+        var result = TryValidateLicenseAsync(licenseKey).Result;
+        licenseKeyData = result;
+        return result != null;
     }
 
     private string FormatLicenseKey(string base32)

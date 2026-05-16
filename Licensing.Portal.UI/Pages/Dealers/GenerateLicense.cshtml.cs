@@ -167,7 +167,7 @@ namespace Licensing.Portal.Pages.Dealers
                 };
 
                 // Call the LicenseService to generate the activation key with sequence
-                var licenseKey = _licenseService.GenerateLicense(
+                var licenseKey = await _licenseService.GenerateLicenseAsync(
                     licenseRequest.SerialNumber,
                     licenseRequest.IssuedAt,
                     licenseRequest.ExpiresAt,

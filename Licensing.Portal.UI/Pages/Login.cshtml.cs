@@ -8,11 +8,13 @@ namespace Licensing.Portal.Pages
     {
         private readonly DealerService _dealerService;
         private readonly IConfiguration _configuration;
+        private readonly AzureTableStorageService _azureTableStorageService;
 
-        public LoginModel(DealerService dealerService, IConfiguration configuration)
+        public LoginModel(DealerService dealerService, IConfiguration configuration, AzureTableStorageService azureTableStorageService)
         {
             _dealerService = dealerService;
             _configuration = configuration;
+            _azureTableStorageService = azureTableStorageService;
         }
 
         [BindProperty]
@@ -29,9 +31,27 @@ namespace Licensing.Portal.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Get admin credentials from appsettings
-            var adminUsername = _configuration["Admin:Username"];
-            var adminPassword = _configuration["Admin:Password"];
+            // Get admin credentials from Azure Table Storage
+            string? adminUsername = null;
+            string? adminPassword = null;   
+
+            try
+            {
+                // Get admin password from Azure Table Storage
+                adminUsername = await _azureTableStorageService.GetAppSettingAsync("AdminUserName");
+                adminPassword = await _azureTableStorageService.GetAppSettingAsync("AdminPassword");
+                
+                if (string.IsNullOrEmpty(adminPassword))
+                {
+                    ErrorMessage = "Unable to retrieve admin credentials. Please contact support.";
+                    return Page();
+                }
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "Unable to retrieve admin credentials. Please contact support.";
+                return Page();
+            }
 
             // Check for admin login
             if (Username == adminUsername && Password == adminPassword)
