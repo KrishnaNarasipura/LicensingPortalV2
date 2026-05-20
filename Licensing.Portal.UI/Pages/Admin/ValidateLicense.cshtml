@@ -3,6 +3,7 @@
 @using Licensing.Portal.Models
 @{
     ViewData["Title"] = "Validate License";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 <style>
@@ -26,23 +27,6 @@
     .header-actions {
         display: flex;
         gap: 10px;
-    }
-
-    .btn-logout {
-        padding: 10px 20px;
-        background: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    .btn-logout:hover {
-        transform: translateY(-2px);
-        background: #c82333;
     }
 
     .form-container {
@@ -271,14 +255,6 @@
     <div>
         <h1>Validate License</h1>
     </div>
-    <div class="header-actions">
-        <a href="/Dealers/Index" class="btn-logout" style="background: #667eea; text-decoration: none; display: inline-flex; align-items: center;">
-            ← Back to Dealers
-        </a>
-        <form method="post" asp-page-handler="Logout" style="display: inline;">
-            <button type="submit" class="btn-logout">Logout</button>
-        </form>
-    </div>
 </div>
 
 <div class="form-container">
@@ -398,6 +374,7 @@
 
             <div class="button-group">
                 <button type="submit" class="btn-submit">Validate License</button>
+                <button type="button" class="btn-cancel" onclick="window.location.href='/Dealers'">Cancel</button>
             </div>
         </form>
     }
