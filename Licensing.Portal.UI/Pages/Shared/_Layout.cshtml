@@ -6,6 +6,47 @@
     <title>@ViewData["Title"] - Licensing Portal</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        .logout-btn-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #dc3545;
+            color: white;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+            color: white;
+        }
+
+        .user-info-nav {
+            color: #666;
+            font-size: 14px;
+            margin-right: 15px;
+        }
+
+        .user-info-nav strong {
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -19,6 +60,20 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                     </ul>
+                    <div class="logout-btn-wrapper">
+                        @{
+                            bool isAdminLoggedIn = !string.IsNullOrEmpty(Context.Session.GetString("AdminUser"));
+                            bool isDealerLoggedIn = !string.IsNullOrEmpty(Context.Session.GetString("DealerUser"));
+                        }
+                        
+                        @if (isAdminLoggedIn || isDealerLoggedIn)
+                        {
+                            <span class="user-info-nav">
+                                Welcome, <strong>@(isAdminLoggedIn ? Context.Session.GetString("AdminUser") : "Dealer")</strong>
+                            </span>
+                            <button type="button" class="logout-btn" onclick="logout()" title="Logout">Logout</button>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
@@ -38,6 +93,25 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear session by posting to logout handler
+                fetch('/Login?handler=Logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(() => {
+                    window.location.href = '/Login';
+                }).catch(err => {
+                    console.error('Logout error:', err);
+                    window.location.href = '/Login';
+                });
+            }
+        }
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

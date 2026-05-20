@@ -96,6 +96,13 @@ namespace Licensing.Portal.Pages
             ErrorMessage = "Invalid username or password";
             return Page();
         }
+
+        public IActionResult OnPostLogout()
+        {
+            // Clear all session data
+            HttpContext.Session.Clear();
+            return RedirectToPage("/Login");
+        }
     }
 }
 
