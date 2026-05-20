@@ -11,12 +11,17 @@
         border-radius: 5px;
         margin-bottom: 20px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
     }
 
     .header h1 {
         color: #333;
         font-size: 28px;
-        margin: 0 0 15px 0;
+        margin: 0;
+        flex-shrink: 0;
     }
 
     .dealers-list-header {
@@ -390,6 +395,8 @@
     @@media (max-width: 768px) {
         .header {
             padding: 15px;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .header h1 {
@@ -542,31 +549,31 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Dealer Code</th>
-                        <th>Dealer Name</th>
-                        <th>Internal ID</th>
-                        <th>Address</th>
-                        <th>Phone Number</th>
-                        <th>Created Date</th>
-                        <th>Actions</th>
+                    <th style="text-align: center;">Dealer Code</th>
+                    <th style="text-align: center;">Dealer Name</th>
+                    <th style="text-align: center;">Internal ID</th>
+                        <th style="text-align: center;">Address</th>
+                    <th style="text-align: center;">Phone Number</th>
+                    <th style="text-align: center;">Created Date</th>
+                        <th style="text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var dealer in Model.Dealers)
                     {
                         <tr>
-                            <td>
+                            <td class="text-center">
                                 <span class="dealer-code">@dealer.DealerCode</span>
                             </td>
-                            <td>@dealer.DealerName</td>
-                            <td>@dealer.InternalDealerId</td>
-                            <td>@dealer.Address, @dealer.City, @dealer.State, @dealer.Pincode</td>
-                            <td>@dealer.PhoneNumber</td>
-                            <td>
+                            <td class="text-center">@dealer.DealerName</td>
+                            <td class ="text-center">@dealer.InternalDealerId</td>
+                            <td class="text-center">@dealer.Address, @dealer.City, @dealer.State, @dealer.Pincode</td>
+                            <td class="text-center">@dealer.PhoneNumber</td>
+                        <td class="text-center">
                                 <span class="created-date">@dealer.CreatedDate.ToString("dd MMM yyyy HH:mm")</span>
                             </td>
-                            <td>
-                                <div class="action-buttons">
+                        <td class="text-center">
+                            <div class="action-buttons">
                                     <form method="post" asp-page-handler="ResetPassword" style="display: inline;">
                                         <input type="hidden" name="dealerCode" value="@dealer.DealerCode" />
                                         <button type="submit" class="btn-small btn-reset">Reset Password</button>
