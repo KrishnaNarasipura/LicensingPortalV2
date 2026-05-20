@@ -64,13 +64,12 @@
                         @{
                             bool isAdminLoggedIn = !string.IsNullOrEmpty(Context.Session.GetString("AdminUser"));
                             bool isDealerLoggedIn = !string.IsNullOrEmpty(Context.Session.GetString("DealerUser"));
+                            string dealerCode = Context.Session.GetString("DealerCode") ?? string.Empty;
                         }
                         
                         @if (isAdminLoggedIn || isDealerLoggedIn)
                         {
-                            <span class="user-info-nav">
-                                Welcome, <strong>@(isAdminLoggedIn ? Context.Session.GetString("AdminUser") : "Dealer")</strong>
-                            </span>
+                            
                             <button type="button" class="logout-btn" onclick="logout()" title="Logout">Logout</button>
                         }
                     </div>

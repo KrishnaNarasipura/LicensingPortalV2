@@ -18,15 +18,18 @@ namespace Licensing.Portal.Pages.Dealers
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
 
+        public string? UserName {get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
             // Check if admin is logged in
             var adminUser = HttpContext.Session.GetString("AdminUser");
+
             if (string.IsNullOrEmpty(adminUser))
             {
                 return RedirectToPage("/Login");
             }
-
+            UserName = adminUser;
             Dealers = await _dealerService.GetAllDealersAsync();
             return Page();
         }
@@ -41,6 +44,7 @@ namespace Licensing.Portal.Pages.Dealers
         {
             // Check if admin is logged in
             var adminUser = HttpContext.Session.GetString("AdminUser");
+
             if (string.IsNullOrEmpty(adminUser))
             {
                 return RedirectToPage("/Login");
@@ -56,7 +60,7 @@ namespace Licensing.Portal.Pages.Dealers
                     Dealers = await _dealerService.GetAllDealersAsync();
                     return Page();
                 }
-
+                
                 var dealer = await _dealerService.GetDealerAsync(dealerCode);
 
                 // Store in TempData to display in modal

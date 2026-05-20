@@ -2,6 +2,7 @@
 @model Licensing.Portal.Pages.Dealers.GenerateLicenseModel
 @{
     ViewData["Title"] = "Generate License";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 <style> 
@@ -27,22 +28,7 @@
         gap: 10px;
     }
 
-    .btn-logout {
-        padding: 10px 20px;
-        background: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    .btn-logout:hover {
-        transform: translateY(-2px);
-        background: #c82333;
-    }
+    
 
     .form-container {
         background: white;
@@ -286,11 +272,7 @@
     <div>
         <h1>Generate License</h1>
     </div>
-    <div class="header-actions">
-        <form method="post" asp-page-handler="Logout" style="display: inline;">
-            <button type="submit" class="btn-logout">Logout</button>
-        </form>
-    </div>
+    
 </div>
 
 <div class="form-container">
@@ -339,6 +321,7 @@
         <div class="button-group">
             <button type="button" class="btn-submit" onclick="window.print()">Print</button>
             <button type="button" class="btn-cancel" onclick="resetForm()">Generate Another</button>
+            
         </div>
     }
     else
@@ -392,7 +375,7 @@
 
             <div class="button-group">
                 <button type="submit" class="btn-submit">Generate License</button>
-                <button type="submit" asp-page-handler="Cancel" class="btn-cancel">Cancel</button>
+                <button type="button" onclick="window.location.href='Dashboard'" class="btn-cancel">Cancel</button>
             </div>
         </form>
     }

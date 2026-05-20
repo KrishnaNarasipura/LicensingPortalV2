@@ -69,20 +69,20 @@ namespace Licensing.Portal.Pages
                 {
                     // Temporary password is correct
                     HttpContext.Session.SetString("DealerCode", dealer.DealerCode);
+                    HttpContext.Session.SetString("DealerUser", dealer.DealerName);
                     
                     if (dealer.PasswordChangeRequired)
                     {
                         return RedirectToPage("/Dealers/ChangePassword");
                     }
 
-                    HttpContext.Session.SetString("DealerUser", Username);
                     return RedirectToPage("/Dealers/Dashboard");
                 }
 
                 // Check if dealer exists with permanent password
                 if (dealer != null && !string.IsNullOrEmpty(dealer.Password) && _dealerService.VerifyPassword(Password, dealer.Password))
                 {
-                    HttpContext.Session.SetString("DealerUser", Username);
+                    HttpContext.Session.SetString("DealerUser", dealer.DealerName);
                     HttpContext.Session.SetString("DealerCode", dealer.DealerCode);
                     return RedirectToPage("/Dealers/Dashboard");
                 }

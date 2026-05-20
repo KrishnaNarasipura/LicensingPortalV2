@@ -2,15 +2,10 @@
 @model Licensing.Portal.Pages.Dealers.CreateModel
 @{
     ViewData["Title"] = "Register Dealer";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
-    <style>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -368,8 +363,7 @@
             }
         }
     </style>
-</head>
-<body>
+
     <div class="header">
         <h1>Register New Dealer</h1>
     </div>
@@ -456,7 +450,7 @@
                     <div class="password-value" id="passwordDisplay"></div>
                     <div class="copy-button-wrapper">
                         <button type="button" class="copy-btn" onclick="copyPasswordToClipboard()" title="Copy password to clipboard">
-                            ðŸ“‹ Copy
+                            Copy
                         </button>
                     </div>
                 </div>
@@ -522,5 +516,3 @@
             }
         });
     </script>
-</body>
-</html>
