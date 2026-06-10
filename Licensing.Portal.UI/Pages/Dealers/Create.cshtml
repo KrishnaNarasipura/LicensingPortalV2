@@ -482,7 +482,7 @@
             navigator.clipboard.writeText(textToCopy).then(() => {
                 // Show success feedback
                 copyButton.classList.add('copied');
-                copyButton.textContent = '? Copied!';
+                copyButton.textContent = 'Copied!';
 
                 // Show toast notification
                 const toast = document.getElementById('toastNotification');
@@ -491,7 +491,7 @@
                 // Reset button and hide toast after 2 seconds
                 setTimeout(() => {
                     copyButton.classList.remove('copied');
-                    copyButton.textContent = '?? Copy';
+                    copyButton.textContent = 'Copy';
                     toast.classList.remove('show');
                 }, 2000);
             }).catch(err => {
