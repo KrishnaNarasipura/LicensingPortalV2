@@ -131,6 +131,53 @@ namespace Licensing.Portal.Services
                 return null;
             }
         }
+
+        /// <summary>
+        /// Upserts (creates or updates) app settings in the AppSettings table
+        /// </summary>
+        public async Task<AppSettingEntity> UpsertAppSettingAsync(AppSettingEntity entity)
+        {
+            await _appSettingsTableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace);
+            return entity;
+        }
+
+        /// <summary>
+        /// Gets a specific app setting entity from the AppSettings table
+        /// </summary>
+        public async Task<AppSettingEntity?> GetAppSettingForECDSAAsync()
+        {
+            try
+            {
+                var response = await _appSettingsTableClient.GetEntityAsync<AppSettingEntity>("AppSettings", "ECDSASecrets");
+                return response.Value;
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                return null;
+            }
+        }
+
+        public async Task<string?> GetAppSettingForECDSAAsync(string settingName)
+        {
+            try
+            {
+                var response = await _appSettingsTableClient.GetEntityAsync<AppSettingEntity>("AppSettings", "ECDSASecrets");
+                if (!string.IsNullOrWhiteSpace(settingName))
+                {
+                    var property = typeof(AppSettingEntity).GetProperty(settingName);
+                    if (property != null)
+                    {
+                        return property.GetValue(response.Value)?.ToString();
+                    }
+                }
+
+                return null;
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                return null;
+            }
+        }
     }
 
 }

@@ -17,5 +17,7 @@ namespace Licensing.Portal.Models
         public string? AdminUserName { get; set; }
         public string? AdminPassword { get; set; }
         public string? LicenseKeySecret { get; set; }
+        public string? ECDSAPrivateKey { get; set; }
+        public string? ECDSAPublicKey { get; set; }
     }
 }
